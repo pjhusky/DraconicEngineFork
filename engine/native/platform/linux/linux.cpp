@@ -25,7 +25,6 @@ namespace draco::platform {
         } else {
             std::println("No video driver was found");
             SDL_Quit();
-            return -1;
         }
 
         SDL_GetWindowSize(window, &frame.width, &frame.height);

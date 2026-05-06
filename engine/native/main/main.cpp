@@ -57,10 +57,10 @@ int main(int argc, char* argv[])
     draco::rendering::renderer::init(1280, 720);
 
     draco::rendering::rhi::TexturedVertex quad[] = {
-        { -0.5f,  0.5f,  0.1f, 0xffffffff, 0.0f, 0.0f },
-        {  0.5f,  0.5f, -0.1f, 0xffffffff, 1.0f, 0.0f },
-        {  0.5f, -0.5f,  0.1f, 0xffffffff, 1.0f, 1.0f },
-        { -0.5f, -0.5f, -0.1f, 0xffffffff, 0.0f, 1.0f }
+        { -0.5f,  0.5f,  0.0f, 0xffffffff, 0.0f, 0.0f },
+        {  0.5f,  0.5f,  0.0f, 0xffffffff, 1.0f, 0.0f },
+        {  0.5f, -0.5f,  0.0f, 0xffffffff, 1.0f, 1.0f },
+        { -0.5f, -0.5f,  0.0f, 0xffffffff, 0.0f, 1.0f }
     };
 
     uint16_t indices[] = { 0,1,2, 2,3,0 };
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
             auto p = pkt;
 
             float model[16];
-            bx::mtxTranslate(model, i * 0.6f - 3.0f, 0.0f, 0.0f);
+            bx::mtxTranslate(model, i * 1.5f - 7.5f, 0.0f, 0.0f);
 
             std::memcpy(p.model, model, sizeof(model));
 
