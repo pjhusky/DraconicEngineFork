@@ -22,8 +22,12 @@ namespace draco::core::io::filesystem
         }
 
         std::streamsize size = file.tellg();
-        if (size <= 0) {
+        if (size < 0) {
             std::println("Error: File is empty or unreadable: {}", path);
+            return {};
+        }
+
+        if (size == 0) {
             return {};
         }
 

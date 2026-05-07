@@ -18,23 +18,23 @@ import rendering.rendergraph;
 export namespace draco::rendering::renderer {
 
     struct Camera {
-        std::array<float, 3> position;
-        std::array<float, 3> target;
-        std::array<float, 3> up;
-        float fov;
-        float near_plane;
-        float far_plane;
+        std::array<float, 3> position {0.0f, 0.0f, 0.0f};
+        std::array<float, 3> target {0.0f, 0.0f, 0.0f};
+        std::array<float, 3> up {0.0f, 1.0f, 0.0f};
+        float fov = 60.0f;
+        float near_plane = 0.1f;
+        float far_plane = 1000.0f;
     };
 
     struct SceneContext {
-        uint16_t screen_width;
-        uint16_t screen_height;
+        uint16_t screen_width = 0;
+        uint16_t screen_height = 0;
         Camera main_camera;
 
         draco::rendering::rendergraph::RenderGraph graph;
     };
 
-    SceneContext g_ctx;
+    inline SceneContext g_ctx;
 
     void init(uint16_t width, uint16_t height);
     void resize(uint16_t width, uint16_t height);

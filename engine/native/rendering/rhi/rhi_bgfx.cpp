@@ -97,7 +97,7 @@ namespace draco::rendering::rhi
         g_height = height;
 
         bgfx::Init init{};
-        init.type = bgfx::RendererType::Vulkan;
+        init.type = bgfx::RendererType::Count;
 
         init.platformData.ndt = display_type;
         init.platformData.nwh = window_handle;
@@ -142,6 +142,9 @@ namespace draco::rendering::rhi
 
             if (bgfx::isValid(slot.value.ibh))
                 bgfx::destroy(slot.value.ibh);
+            
+            if (bgfx::isValid(slot.value.dvbh))
+                bgfx::destroy(slot.value.dvbh);
         }
 
         for (auto& slot : g_pipelines.internal().raw())
@@ -270,7 +273,7 @@ namespace draco::rendering::rhi
         g_uniforms.destroy(h);
     }
 
-    TextureHandle create_texture(const void* data, uint16_t w, uint16_t h, uint32_t)
+    TextureHandle create_texture(const void* data, uint32_t w, uint32_t h, uint32_t flags)
     {
         RHI_ASSERT(data != nullptr, "Texture data is null");
         RHI_ASSERT(w > 0 && h > 0, "Invalid texture dimensions");
@@ -278,7 +281,7 @@ namespace draco::rendering::rhi
         auto tex = bgfx::createTexture2D(
             w, h, false, 1,
             bgfx::TextureFormat::RGBA8,
-            BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP,
+            flags == 0 ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP) : flags,
             bgfx::copy(data, w * h * 4)
         );
 
@@ -414,6 +417,9 @@ namespace draco::rendering::rhi
         if ((s & PipelineState::MSAA) != PipelineState::Default)
             state |= BGFX_STATE_MSAA;
 
+        if ((s & PipelineState::PrimitiveTriStrip) != PipelineState::Default)
+            state |= BGFX_STATE_PT_TRISTRIP;
+
         return state;
     }
 
@@ -431,7 +437,7 @@ namespace draco::rendering::rhi
 
     void apply_view(ViewID view, const ViewDesc& desc)
     {
-            if (desc.fb != InvalidFramebuffer)
+        if (desc.fb != InvalidFramebuffer)
         {
             auto* fb = get_checked(g_framebuffers, desc.fb, "Framebuffer");
 

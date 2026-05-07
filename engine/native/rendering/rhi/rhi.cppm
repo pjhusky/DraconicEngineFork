@@ -62,9 +62,9 @@ export namespace draco::rendering::rhi
 
     struct ViewDesc {
         FramebufferHandle fb = InvalidFramebuffer;
-        uint16_t x, y, w, h;
-        uint32_t clear_flags;
-        uint32_t clear_color;
+        uint16_t x = 0, y = 0, w = 0, h = 0;
+        uint32_t clear_flags = 0;
+        uint32_t clear_color = 0;
     };
 
     enum class UniformType
@@ -143,7 +143,7 @@ export namespace draco::rendering::rhi
     {
         ShaderHandle vs;
         ShaderHandle fs;
-        PipelineState state;
+        PipelineState state = PipelineState::Default;
 
         BlendMode blend = BlendMode::None;
         DepthTest depth = DepthTest::Less;
@@ -197,10 +197,10 @@ export namespace draco::rendering::rhi
     void destroy_uniform(UniformHandle handle);
     void set_uniform(UniformHandle handle, const void* value, uint16_t num = 1);
 
-    TextureHandle create_texture(const void* data, uint16_t width, uint16_t height, uint32_t flags = 0);
+    TextureHandle create_texture(const void* data, uint32_t width, uint32_t height, uint32_t flags = 0);
     void destroy_texture(TextureHandle handle);
 
-    FramebufferHandle create_framebuffer(uint16_t width, uint16_t height, TextureFormat format);
+    FramebufferHandle create_framebuffer(uint32_t width, uint32_t height, TextureFormat format);
     void destroy_framebuffer(FramebufferHandle handle);
     TextureHandle get_framebuffer_texture(FramebufferHandle handle);
 

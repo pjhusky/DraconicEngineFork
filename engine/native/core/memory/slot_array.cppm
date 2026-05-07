@@ -13,7 +13,7 @@ export namespace draco::core::memory
     struct Slot
     {
         T value{};
-        uint16_t generation = 0;
+        uint32_t generation = 0;
         bool alive = false;
     };
 
@@ -25,7 +25,7 @@ export namespace draco::core::memory
 
         Handle create(const T& value)
         {
-            uint16_t idx;
+            uint32_t idx;
 
             if (!free_list.empty())
             {
@@ -34,7 +34,7 @@ export namespace draco::core::memory
             }
             else
             {
-                idx = static_cast<uint16_t>(slots.size());
+                idx = static_cast<uint32_t>(slots.size());
                 slots.push_back({});
             }
 
@@ -48,7 +48,7 @@ export namespace draco::core::memory
 
         bool valid(Handle h) const
         {
-            uint16_t i = h.index();
+            uint32_t i = h.index();
 
             return i < slots.size()
                 && slots[i].alive
@@ -83,13 +83,13 @@ export namespace draco::core::memory
             free_list.push_back(h.index());
         }
 
-        std::vector<Slot<T>>& raw()
+        const std::vector<Slot<T>>& raw() const
         {
             return slots;
         }
 
     private:
         std::vector<Slot<T>> slots;
-        std::vector<uint16_t> free_list;
+        std::vector<uint32_t> free_list;
     };
 }

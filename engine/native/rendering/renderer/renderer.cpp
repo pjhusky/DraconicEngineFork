@@ -57,7 +57,8 @@ namespace draco::rendering::renderer
 
         draco::rendering::rhi::look_at(view_mtx, g_ctx.main_camera.position.data(), g_ctx.main_camera.target.data(), g_ctx.main_camera.up.data());
 
-        float aspect = float(g_ctx.screen_width) / float(g_ctx.screen_height);
+        const auto safe_height = std::max<uint16_t>(g_ctx.screen_height, 1);
+        float aspect = float(g_ctx.screen_width) / float(safe_height);
 
         draco::rendering::rhi::perspective(proj_mtx, g_ctx.main_camera.fov, aspect, g_ctx.main_camera.near_plane, g_ctx.main_camera.far_plane);
 

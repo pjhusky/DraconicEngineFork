@@ -64,13 +64,19 @@ target_link_libraries(draconic
     bgfx
     bx
     bimg
-    -Wl,--whole-archive SDL3::SDL3-static -Wl,--no-whole-archive
-    c++ 
-    c++abi
-    dl 
-    pthread 
-    m
 )
+
+find_package(Threads REQUIRED)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(draconic PRIVATE SDL3::SDL3-static Threads::Threads dl)
+    target_link_options(draconic PRIVATE -Wl,--whole-archive $<TARGET_FILE:SDL3::SDL3-static> -Wl,--no-whole-archive)
+elseif(APPLE)
+    target_link_libraries(draconic PRIVATE SDL3::SDL3-static)
+    target_link_options(draconic PRIVATE -Wl,-force_load,$<TARGET_FILE:SDL3::SDL3-static>)
+else()
+    target_link_libraries(draconic PRIVATE SDL3::SDL3-static)
+endif()
 
 # Asset sync
 set(ENGINE_SHADER_DIR "${CMAKE_SOURCE_DIR}/engine/native/rendering/shaders")

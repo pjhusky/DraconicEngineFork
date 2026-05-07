@@ -140,11 +140,18 @@ int main(int argc, char* argv[])
             draco::input::process_event(e);
         }
 
+        static int dw = 1280; // Default width, it shouldn't be modified
+        static int dh = 720; // Default height, it shouldn't be modified
+
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
 
-        draco::rendering::rhi::resize((uint16_t)w, (uint16_t)h);
-        draco::rendering::renderer::resize((uint16_t)w, (uint16_t)h);
+        if (w != dw || h != dh) {
+            draco::rendering::rhi::resize(static_cast<uint16_t>(w), static_cast<uint16_t>(h));
+            draco::rendering::renderer::resize(static_cast<uint16_t>(w), static_cast<uint16_t>(h));
+            dw = w;
+            dh = h;
+        }
 
         camera.update(dt);
 

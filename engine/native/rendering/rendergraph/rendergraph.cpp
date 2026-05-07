@@ -21,9 +21,6 @@ namespace draco::rendering::rendergraph {
 
     void RenderGraph::execute() {
         for (auto& pass : m_passes) {
-
-            std::println("[RenderGraph] Executing pass: {}", pass.name); // Debug
-
             draco::rendering::rhi::apply_view(pass.view, {pass.framebuffer, 0, 0, pass.width, pass.height, pass.clear_flags, pass.clear_color});
 
             draco::rendering::rhi::set_view_projection(pass.view, pass.view_mtx, pass.proj_mtx);

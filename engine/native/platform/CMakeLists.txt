@@ -9,8 +9,11 @@ else()
     set(PLATFORM_SRC "linux/linux.cpp")
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(X11_LIBS REQUIRED IMPORTED_TARGET x11 xext xcursor xrandr xrender xi xfixes)
-    pkg_check_modules(WAYLAND_LIBS REQUIRED IMPORTED_TARGET wayland-client wayland-egl wayland-cursor egl)
-    set(PLATFORM_DEPS PkgConfig::X11_LIBS PkgConfig::WAYLAND_LIBS)
+    pkg_check_modules(WAYLAND_LIBS IMPORTED_TARGET wayland-client wayland-egl wayland-cursor egl)
+    set(PLATFORM_DEPS PkgConfig::X11_LIBS)
+    if(WAYLAND_LIBS_FOUND)
+        list(APPEND PLATFORM_DEPS PkgConfig::WAYLAND_LIBS)
+    endif()
 endif()
 
 add_library(platform SHARED)
@@ -27,3 +30,7 @@ target_sources(platform
 target_include_directories(platform INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 target_link_libraries(platform PRIVATE SDL3::SDL3-static ${PLATFORM_DEPS})
+
+if(DRACO_HAS_WAYLAND)
+    target_compile_definitions(platform PRIVATE DRACO_HAS_WAYLAND=1)
+endif()
