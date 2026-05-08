@@ -58,6 +58,7 @@ target_link_libraries(draconic
     platform
     input
     camera # Camera controller
+    transform
     rhi
     renderer
     rendergraph

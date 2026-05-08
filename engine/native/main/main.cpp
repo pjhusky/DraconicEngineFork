@@ -11,6 +11,7 @@ import core.io.image_loader;
 import input;
 import platform;
 import scene.camera.controller;
+import scene.transform;
 
 import rendering.rhi;
 import rendering.rhi.vertex;
@@ -161,17 +162,25 @@ int main(int argc, char* argv[])
         struct TestMesh
         {
             draco::rendering::mesh::MeshHandle handle;
-            float x, y, z;
+            draco::scene::Transform transform;
         };
 
         TestMesh tests[] =
-        {
-            { cube_mesh,     -12.0f, 0.0f, 0.0f },
-            { plane_mesh,     -6.0f, 0.0f, 0.0f },
-            { sphere_mesh,     0.0f, 0.0f, 0.0f },
-            { cylinder_mesh,   6.0f, 0.0f, 0.0f },
-            { capsule_mesh,   12.0f, 0.0f, 0.0f },
+        { 
+            { cube_mesh,     draco::scene::make_transform() },
+            { plane_mesh,    draco::scene::make_transform() },
+            { sphere_mesh,   draco::scene::make_transform() },
+            { cylinder_mesh, draco::scene::make_transform() },
+            { capsule_mesh,  draco::scene::make_transform() },
         };
+
+        draco::scene::set_position(tests[0].transform, -12.0f, 0.0f, 0.0f);
+        draco::scene::set_position(tests[1].transform,  -6.0f, 0.0f, 0.0f);
+        draco::scene::set_position(tests[2].transform,   0.0f, 0.0f, 0.0f);
+        draco::scene::set_position(tests[3].transform,   6.0f, 0.0f, 0.0f);
+        draco::scene::set_position(tests[4].transform,  12.0f, 0.0f, 0.0f);
+
+        draco::scene::set_rotation(tests[1].transform, -bx::kPiHalf, 0.0f, 0.0f); // Rotate the plane mesh
 
         for (auto& t : tests)
         {
@@ -191,21 +200,9 @@ int main(int argc, char* argv[])
             p.uniforms.push_back({ u_tint, tint, 1 });
             p.uniforms.push_back({ u_offset, offset, 1 });
 
-            float translate[16];
-            bx::mtxTranslate(translate, t.x, t.y, t.z);
-
-            float rotate[16];
-            if (t.handle == plane_mesh) {
-                // Rotate the plane -90 degrees on the X-axis so it lays flat
-                bx::mtxRotateX(rotate, -bx::kPiHalf); 
-            } else {
-                // Everything else stays upright
-                bx::mtxIdentity(rotate); 
-            }
-
             float model[16];
-            bx::mtxMul(model, rotate, translate);
-            
+            draco::scene::compute_matrix(t.transform, model);
+
             std::memcpy(p.model, model, sizeof(model));
 
             draco::rendering::renderer::submit_entity(p, 0);
