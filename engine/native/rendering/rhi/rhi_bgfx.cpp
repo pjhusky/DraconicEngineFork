@@ -572,7 +572,7 @@ namespace draco::rendering::rhi
     {
         auto* pipeline = get_checked(g_pipelines, p.pipeline, "Pipeline");
         auto* vb = get_checked(g_buffers, p.vertex_buffer, "VertexBuffer");
-        auto* ib = nullptr;
+        Buffer* ib = nullptr;
 
         if (!pipeline || !vb)
             return;
