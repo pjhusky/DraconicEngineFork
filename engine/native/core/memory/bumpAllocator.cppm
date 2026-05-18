@@ -1,6 +1,5 @@
 module;
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -36,100 +35,13 @@ export namespace draco::memory
 			Allocator baseAlloc,
 			// one page by default on unix-like systems
 			size_t minAllocRequest = (1 << 12)
-		)
-		{
-			memset(alloc, 0, sizeof(BumpAllocator));
-			alloc->base = baseAlloc;
-			alloc->minAllocRequest = minAllocRequest;
-		}
+		);
 
-		void deinit(BumpAllocator *alloc)
-		{
-			Node *lastNode;
-			Node *node = alloc->first;
-			while (node != nullptr)
-			{
-				lastNode = node;
-				node = node->next;
-				alloc->base.vtbl->free(
-					alloc->base,
-					{
-						.data = (void*)lastNode,
-						.size = lastNode->size + sizeof(Node),
-				   	}
-				);
-			}
-		}
+		void deinit(BumpAllocator *alloc);
 
-		Error alloc(
-			Allocator alloc,
-			Slice *dst,
-			size_t size,
-			size_t align
-		)
-		{
-			Error err;
-			BumpAllocator *allocData = (BumpAllocator *)alloc.allocatorData;
-			uintptr_t alignMask = align - 1;
-			Node **lastNode;
-			Node **node = &(allocData->first);
-			size_t pos = allocData->allocated;
-			size_t oldPos = pos;
-			size_t reqSize = size;
-			size_t spillover = 0;
-			Slice newBlock;
-			uintptr_t currentPtr;
-			assert(std::popcount(align) == 1);
-			lastNode = node;
-			while (((*node) != nullptr) & (pos > 0))
-			{
-				oldPos = pos;
-				pos -= std::min((*node)->size, pos);
-				lastNode = node;
-				node = &((*node)->next);
-			}
-			assert(pos == 0); // fraudulent mark provided
-			currentPtr = (uintptr_t)&((*lastNode)->data[oldPos]);
-			reqSize = size + ((align - (currentPtr & alignMask)) & alignMask);
-			if (!(*lastNode) || (reqSize > ((*lastNode)->size - oldPos)))
-			{
-				if (*lastNode)
-				{
-					spillover = ((*lastNode)->size - oldPos);
-				}
-				reqSize = (sizeof(Node) + size + alignMask) & ~alignMask;
-				err = allocData->base.vtbl->alloc(
-					allocData->base,
-					&newBlock,
-					std::max(allocData->minAllocRequest, reqSize),
-					std::max(alignof(Node), align)
-				);
-				if (err != Error::Okay)
-				{
-					return Error::OutOfMemory;
-				}
-				(*node) = (Node *)newBlock.data;
-				(*node)->next = nullptr;
-				(*node)->size = newBlock.size - sizeof(Node);
-				pos = 0;
-				lastNode = node;
-				oldPos = 0;
-			}
-			currentPtr = ((uintptr_t)&((*lastNode)->data[oldPos]));
-			reqSize = size + ((align - (currentPtr & alignMask)) & alignMask);
-			currentPtr = (currentPtr + alignMask) & ~alignMask;
-			allocData->allocated += reqSize + spillover;
-			dst->data = (void*)currentPtr;
-			dst->size = size;
-			return Error::Okay;
-		}
+		Error alloc(Allocator alloc, Slice *dst, size_t size, size_t align);
 
-		Error freeAll(Allocator alloc)
-		{
-			BumpAllocator *allocData = (BumpAllocator *)alloc.allocatorData;
-			allocData->allocated = 0;
-			return Error::Okay;
-		}
+		Error freeAll(Allocator alloc);
 
 		AllocatorVTbl bumpAllocatorVtbl = {
 			.alloc = alloc,
@@ -137,15 +49,9 @@ export namespace draco::memory
 			.freeAll = freeAll,
 		};
 
-		size_t saveMark(BumpAllocator *self)
-		{
-			return self->allocated;
-		}
+		size_t saveMark(BumpAllocator *self);
 
-		void resumeMark(BumpAllocator *self, size_t mark)
-		{
-			self->allocated = mark;
-		}
+		void resumeMark(BumpAllocator *self, size_t mark);
 
 		inline void asAllocator(Allocator *dst, BumpAllocator *alloc)
 		{

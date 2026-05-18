@@ -44,24 +44,11 @@ export namespace draco::memory
 		Slice *dst,
 		size_t size,
 		size_t align
-	)
-	{
-		return Error::NotImplemented;
-	}
+	);
 
-	Error nilFree(Allocator alloc, Slice block)
-	{
-		return Error::NotImplemented;
-	}
+	Error nilFree(Allocator alloc, Slice block);
 
-	Error nilFreeAll(Allocator alloc)
-	{
-		return Error::NotImplemented;
-	}
+	Error nilFreeAll(Allocator alloc);
 
-	void asAllocatorVoid(Allocator *dst, void *alloc, AllocatorVTbl *vtbl)
-	{
-		dst->allocatorData = (void*)alloc;
-		dst->vtbl = vtbl;
-	}
+	void asAllocatorVoid(Allocator *dst, void *alloc, AllocatorVTbl *vtbl);
 }
