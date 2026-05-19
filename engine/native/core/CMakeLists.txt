@@ -7,19 +7,3 @@ target_link_libraries(io PUBLIC definitions stb_image)
 
 add_modules_library(memory)
 target_link_libraries(memory PUBLIC definitions)
-
-add_library(image_loader)
-
-target_sources(image_loader
-    PUBLIC
-        FILE_SET CXX_MODULES FILES io/image_loader.cppm
-    PRIVATE
-        io/image_loader.cpp
-)
-
-target_link_libraries(image_loader
-    PRIVATE
-        stb_image
-        io
-        definitions
-)

@@ -11,29 +11,29 @@ export namespace draco::core::memory
     class HandleRegistry
     {
     public:
-        using Handle = Handle<Tag>;
+        using HandleType = Handle<Tag>;
 
-        Handle create(const T& value)
+        HandleType create(const T& value)
         {
             return storage.create(value);
         }
 
-        bool valid(Handle h) const
+        bool valid(HandleType h) const
         {
             return storage.valid(h);
         }
 
-        T* get(Handle h)
+        T* get(HandleType h)
         {
             return storage.get(h);
         }
 
-        const T* get(Handle h) const
+        const T* get(HandleType h) const
         {
             return storage.get(h);
         }
 
-        void destroy(Handle h)
+        void destroy(HandleType h)
         {
             storage.destroy(h);
         }

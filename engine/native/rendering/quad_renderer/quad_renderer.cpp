@@ -1,6 +1,5 @@
 module;
 
-#include <algorithm>
 #include <cmath>
 
 #include <bgfx/bgfx.h>

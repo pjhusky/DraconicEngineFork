@@ -2,7 +2,6 @@ module;
 
 #include <vector>
 #include <cstdint>
-#include <cmath>
 
 export module rendering.quad_renderer;
 

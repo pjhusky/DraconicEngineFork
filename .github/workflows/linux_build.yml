@@ -1,0 +1,63 @@
+name: Draconic Engine Linux Build
+description: Build Draconic Engine on Linux using Clang 20 and CMake with Ninja
+
+on:
+  push:
+    branches:
+      - '**'        # Run on every single branch push
+  pull_request:
+    branches:
+      - '**'        # Run on every single PR target branch
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive # Pulls in the thirdparty libs (SDL3, bgfx, etc.)
+
+      - name: Set up Clang Compiler
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: 20 # Use Clang 20 for C++23 support
+
+      # Install necessary system dependencies for building on Linux
+      - name: Install Linux System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            libasound2-dev \
+            libpulse-dev \
+            libwayland-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev
+
+      - name: Configure CMake Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/.cmake/
+            build/CMakeCache.txt
+            build/CMakeFiles/
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-
+
+      - name: Configure Build System
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_C_COMPILER=clang
+
+      - name: Compile Target Binary
+        run: |
+          cmake --build build --config Debug

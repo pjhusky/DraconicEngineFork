@@ -16,7 +16,7 @@ else()
     endif()
 endif()
 
-add_library(platform SHARED)
+add_library(platform STATIC)
 
 target_sources(platform
     PUBLIC FILE_SET CXX_MODULES 

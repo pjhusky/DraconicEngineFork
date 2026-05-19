@@ -4,7 +4,6 @@ module;
 #include <cstdint>
 #include <cmath>
 #include <unordered_map>
-#include <tuple>
 
 module rendering.mesh;
 

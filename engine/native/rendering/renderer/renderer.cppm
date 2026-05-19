@@ -1,12 +1,7 @@
 module;
 
-#include <vector>
 #include <array>
-#include <string>
 #include <cstdint>
-#include <functional>
-#include <cstring>
-#include <algorithm>
 
 #include <bx/math.h>
 
