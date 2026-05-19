@@ -1,3 +1,4 @@
 add_modules_library(definitions PIC)
 add_modules_library(math)
+add_modules_library(memory)
 target_link_libraries(math PUBLIC definitions)
