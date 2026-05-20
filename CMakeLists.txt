@@ -19,6 +19,7 @@ project(DraconicEngine LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
+include(Compiler)
 include(Shaders)
 
 # Subdirectories for engine libs

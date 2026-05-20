@@ -1,4 +1,4 @@
-name: Draconic Engine Linux Build
+name: 🐧 Linux Builds
 
 description: Build Draconic Engine on Linux using Clang 20 and CMake with Ninja
 
@@ -25,25 +25,12 @@ jobs:
         with:
           version: 20
 
-      - name: Cache Build Directory
-        uses: actions/cache@v4
-        with:
-          path: build/debug
-          # This generates a unique key based on the configuration
-          # If a CMakeLists.txt or source file changes, it will look for the closest match
-          key: ${{ runner.os }}-draconic-build-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-draconic-build-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}-
-            ${{ runner.os }}-draconic-build-
-
-      - name: Install CMake 4.3.0
+      - name: Install System Dependencies
         run: |
           wget https://github.com/Kitware/CMake/releases/download/v4.3.0/cmake-4.3.0-linux-x86_64.tar.gz
           tar -xzf cmake-4.3.0-linux-x86_64.tar.gz
           echo "$(pwd)/cmake-4.3.0-linux-x86_64/bin" >> $GITHUB_PATH
 
-      - name: Install Linux System Dependencies
-        run: |
           sudo apt-get update
           sudo apt-get install -y \
             ninja-build \
@@ -77,16 +64,25 @@ jobs:
           clang++ --version
           clang-scan-deps --version
 
+      - name: Cache Build Artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/debug/.ninja_deps
+            build/debug/.ninja_log
+            build/debug/CMakeFiles
+          key: ${{ runner.os }}-draconic-build-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/CMakePresets.json') }}
+          restore-keys: |
+            ${{ runner.os }}-draconic-build-
+
       - name: Configure Build System
         run: |
-          # REMOVED 'rm -rf build/debug' so the cache doesn't get instantly nuked!
-          
           cmake --preset debug \
             -B build/debug \
             -DCMAKE_C_COMPILER=clang \
             -DCMAKE_CXX_COMPILER=clang++ \
-            -DCMAKE_CXX_FLAGS="-stdlib=libc++ -mavx2 -mfma" \
-            -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -mavx2 -mfma" \
+            -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+            -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++" \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
             -DCMAKE_INSTALL_RPATH="\$ORIGIN:\$ORIGIN/engine/native"
 
@@ -94,10 +90,14 @@ jobs:
         run: |
           cmake --build build/debug -j$(nproc)
 
+      - name: Run Unit Tests
+        run: |
+          ctest --test-dir build/debug --output-on-failure -j$(nproc)
+
       - name: Upload Engine Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: draconic-linux-debug
+          name: linux_debug
           path: build/debug/
           if-no-files-found: error
           retention-days: 7

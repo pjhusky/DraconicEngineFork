@@ -2,6 +2,7 @@ module;
 
 #include <numbers>
 #include <limits>
+#include <cstdint>
 
 export module core.math.constants;
 import core.defs;
