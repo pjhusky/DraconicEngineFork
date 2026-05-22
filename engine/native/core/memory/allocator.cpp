@@ -1,5 +1,7 @@
 module;
 
+#include <source_location>
+
 module core.memory.allocator;
 import core.stdtypes;
 
@@ -10,6 +12,9 @@ namespace draco::memory
 		Slice *dst,
 		usize size,
 		usize align
+#ifdef DEBUG
+		, std::source_location loc
+#endif
 	)
 	{
 		return Error::NotImplemented;

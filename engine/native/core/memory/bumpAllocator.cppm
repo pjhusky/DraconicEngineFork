@@ -1,6 +1,7 @@
 module;
 
 #include <cassert>
+#include <source_location>
 
 export module core.memory.bumpAllocator;
 export import core.memory.allocator;
@@ -35,7 +36,15 @@ export namespace draco::memory
 
 		void deinit(BumpAllocator *alloc);
 
-		Error alloc(Allocator alloc, Slice *dst, usize size, usize align);
+		Error alloc(
+			Allocator alloc,
+			Slice *dst,
+			usize size,
+			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
+		);
 
 		Error freeAll(Allocator alloc);
 

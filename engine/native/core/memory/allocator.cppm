@@ -1,5 +1,7 @@
 module;
 
+#include <source_location>
+
 export module core.memory.allocator;
 export import core.memory.slice;
 export import core.stdtypes;
@@ -21,7 +23,17 @@ export namespace draco::memory
 	struct Allocator
 	{
 		AllocatorVTbl *vtbl;
-		void *allocatorData;
+		rawptr allocatorData;
+		inline Error alloc(
+			Slice *dst,
+			usize size,
+			usize align
+#ifdef DEBUG
+			, std::source_location loc = std::source_location::current()
+#endif
+		);
+		inline Error free(Slice block);
+		inline Error freeAll();
 	};
 
 	struct AllocatorVTbl
@@ -31,6 +43,9 @@ export namespace draco::memory
 			Slice *dst,
 			usize size,
 			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		);
 		using FreeFn = Error (*)(Allocator alloc, Slice block);
 		using FreeAllFn = Error (*)(Allocator alloc);
@@ -44,6 +59,9 @@ export namespace draco::memory
 		Slice *dst,
 		usize size,
 		usize align
+#ifdef DEBUG
+		, std::source_location loc
+#endif
 	);
 
 	Error nilFree(Allocator alloc, Slice block);
@@ -51,4 +69,33 @@ export namespace draco::memory
 	Error nilFreeAll(Allocator alloc);
 
 	void asAllocatorVoid(Allocator *dst, rawptr alloc, AllocatorVTbl *vtbl);
+	inline Error Allocator::alloc(
+			Slice *dst,
+			usize size,
+			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
+	)
+	{
+		return vtbl->alloc(
+			*this,
+			dst,
+			size,
+			align
+#ifdef DEBUG
+			, loc
+#endif
+		);
+	}
+
+	inline Error Allocator::free(Slice block)
+	{
+		return vtbl->free(*this, block);
+	}
+
+	inline Error Allocator::freeAll()
+	{
+		return vtbl->freeAll(*this);
+	}
 }

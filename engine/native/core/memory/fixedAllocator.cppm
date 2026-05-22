@@ -1,7 +1,7 @@
 module;
 
 #include <cassert>
-#include <cstdint>
+#include <source_location>
 
 export module core.memory.fixedAllocator;
 export import core.memory.allocator;
@@ -14,14 +14,22 @@ export namespace draco::memory
 	{
 		struct FixedAllocator
 		{
-			uint8_t *buffer;
+			u8 *buffer;
 			usize size;
 			bool allocated;
 		};
 
 		void init(FixedAllocator *alloc, Slice block);
 
-		Error alloc(Allocator alloc, Slice *dst, usize size, usize align);
+		Error alloc(
+			Allocator alloc,
+			Slice *dst,
+			usize size,
+			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
+		);
 
 		Error freeAll(Allocator alloc);
 

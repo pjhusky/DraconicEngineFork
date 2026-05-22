@@ -1,5 +1,6 @@
 module;
 
+#include <source_location>
 #ifdef __unix__
 #include <sys/mman.h>
 #include <unistd.h>
@@ -20,6 +21,9 @@ namespace draco::memory::page
 			Slice *dst,
 			usize size,
 			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			int pageSizeSub1 = getpagesize() - 1;
@@ -27,7 +31,7 @@ namespace draco::memory::page
 			// if this overflows, the request was never going to fit into
 			// memory to begin with.
 			usize reqSize = (size + (pageSizeSub1)) & (~pageSizeSub1);
-			void *ptr = mmap(
+			rawptr ptr = mmap(
 				nullptr,
 				reqSize,
 				PROT_READ | PROT_WRITE,
@@ -57,12 +61,15 @@ namespace draco::memory::page
 			Slice *dst,
 			usize size,
 			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			SYSTEM_INFO sysinfo;
 			usize pageSizeSub1;
 			usize reqSize;
-			void *ptr;
+			rawptr ptr;
 			GetSystemInfo(&sysinfo);
 			pageSizeSub1 = (usize)(sysinfo.dwAllocationGranularity - 1);
 			// Coderabbit, this is for a 64-bit machine with 48-bit addressing,
@@ -89,6 +96,9 @@ namespace draco::memory::page
 			Slice *dst,
 			usize size,
 			usize align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			usize pageSize = GetLargePageMinimum();
@@ -97,7 +107,7 @@ namespace draco::memory::page
 			// if this overflows, the request was never going to fit into
 			// memory to begin with.
 			usize reqSize = (size + (pageSizeSub1)) & (~pageSizeSub1);
-			void *ptr;
+			rawptr ptr;
 			ptr = VirtualAlloc(
 				nullptr,
 				reqSize,
