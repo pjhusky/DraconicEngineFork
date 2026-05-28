@@ -75,8 +75,6 @@ jobs:
         run: |
           cmake --preset debug \
             -B build/debug \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
